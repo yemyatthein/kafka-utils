@@ -17,6 +17,7 @@ from __future__ import absolute_import
 from collections import namedtuple
 
 import mock
+from kazoo.exceptions import NoNodeError
 
 from kafka_utils.util.config import ClusterConfig
 from kafka_utils.util.serialization import dump_json
@@ -313,3 +314,13 @@ class TestZK(object):
                 },
             }
             assert actual_without_fetch_state == expected_without_fetch_state
+
+    def test_check_node_existance(self, mock_client):
+        with ZK(self.cluster_config) as zk:
+            zk.get_children = mock.Mock(
+                return_value="test_return_value"
+            )
+            assert zk.check_node_existance("test_path") is True
+
+            zk.get_children.side_effect = NoNodeError("The node does not exist")
+            assert zk.check_node_existance("test_path") is False

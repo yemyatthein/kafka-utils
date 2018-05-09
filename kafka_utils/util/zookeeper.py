@@ -436,6 +436,18 @@ class ZK:
         _log.debug("ZK: Creating node " + path)
         return self.zk.create(path, value, acl, ephemeral, sequence, makepath)
 
+    def check_node_existance(self, path):
+        """Check the existance of the node.
+
+        :param: path: The path of the node.
+        """
+        try:
+            self.get_children(path)
+        except NoNodeError:
+            return False
+
+        return True
+
     def delete(self, path, recursive=False):
         """Deletes a Zookeeper node.
 
